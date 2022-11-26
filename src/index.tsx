@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from 'react-dom/client';
 import { RecoilRoot } from "recoil";
 import { ThemeProvider } from "styled-components";
 import App from "./App";
@@ -60,7 +60,6 @@ table {
 body {
   font-weight: 300;
   font-family: 'Source Sans Pro', sans-serif;
-  background-color:${(props) => props.theme.bgColor};
   color:black;
   line-height: 1.2;
   background:linear-gradient(135deg,#e09,#d0e);
@@ -70,14 +69,13 @@ a {
   color:inherit;
 }
 `;
-ReactDOM.render(
-  <React.StrictMode>
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(
     <RecoilRoot>
-      <ThemeProvider theme={darkTheme}>
-        <GlobalStyle />
+    <ThemeProvider theme={darkTheme}>
+      <GlobalStyle />
       <App />
-      </ThemeProvider>
-    </RecoilRoot>
-  </React.StrictMode>,
-  document.getElementById("root")
+    </ThemeProvider>
+  </RecoilRoot>
 );
