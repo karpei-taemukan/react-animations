@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import {motion, useMotionValue, useScroll, useTransform} from "framer-motion";
+import {AnimatePresence, motion, useMotionValue, useScroll, useTransform} from "framer-motion";
 
 const Wrapper = styled(motion.div)`
   height: 500vh;
@@ -23,6 +23,9 @@ const myVars = {
   start: {scale: 0},
   end: {scale: 1, rotateZ: 360, transition:{type: "spring", bounce:0.8, duration: 2, delay: 1}}
 };
+
+
+//---------------------------------------------------------------------------------------------
 
 const Box1 = styled(motion.div)`
   width: 200px;
@@ -72,6 +75,9 @@ const circleVariants = {
    }
 };
 
+
+//---------------------------------------------------------------------------------------------
+
 const Box2 = styled(motion.div)`
   width: 200px;
   height: 200px;
@@ -96,6 +102,9 @@ const box2Vars = {
   }
 };
 
+
+//---------------------------------------------------------------------------------------------
+
 const BiggerBox = styled.div`
 width: 600px;
 height: 600px;
@@ -107,6 +116,8 @@ align-items: center;
 overflow: hidden;
 `
 
+//---------------------------------------------------------------------------------------------
+
 const Box3 = styled(motion.div)`
   width: 200px;
   height: 200px;
@@ -115,6 +126,7 @@ const Box3 = styled(motion.div)`
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
+//---------------------------------------------------------------------------------------------
 
 const Svg = styled.svg`
   width: 300px;
@@ -136,9 +148,80 @@ const svg = {
   }
 }
 
+//---------------------------------------------------------------------------------------------
+
+const Box4 = styled(motion.div)`
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+`;
+
+const box4Vars = {
+  initial:{
+    opacity:0,
+    scale:0,
+  },
+  visible:{
+    opacity:1,
+    scale:1,
+    rotateZ: 360,
+  },
+  leaving:{
+    opacity:0,
+    scale:0,
+    y: 120,
+  }
+}
+
+//---------------------------------------------------------------------------------------------
+
+const Box5 = styled(motion.div)`
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+position: absolute;
+top: 410%;
+`;
+
+const box5Vars = {
+  entry: (back:boolean) => ({
+
+    x:back ? -500 : 500,
+    opacity: 0,
+    scale: 0,
+
+  }),
+  center: {
+    x:0,
+    opacity: 1,
+    scale: 1,
+    rotateY: 720,
+    transition: {
+      duration: 0.3,
+    }
+  },
+  exit: (back:boolean) => ({
+    x:back ? 500 : -500,
+    opacity: 0,
+    scale: 0,
+    rotateX: 180,
+    transition: {
+      duration: 0.3,
+    }
+  })
+}
+
 function App(){
   const biggerBoxRef = useRef<HTMLDivElement>(null);
 
+  //------------------------------------------------------------------------
 
   const x = useMotionValue(0);
   //console.log(x); 
@@ -146,6 +229,7 @@ function App(){
   //useMotionValue는 다시 랜더링이 되지않는다 
   //그래서 한번만 출력된다
 
+  //------------------------------------------------------------------------
 
   const rotateZ = useTransform(x, [-900,0, 900], [-360,0, 360]);
 
@@ -154,6 +238,7 @@ function App(){
    x.onChange(() => console.log(rotateZ.get()))
   },[x])  
 
+  //------------------------------------------------------------------------
 
 const gradient = 
 useTransform(x, 
@@ -165,6 +250,7 @@ useTransform(x,
   ]
   );
 
+  //------------------------------------------------------------------------
 
 const {scrollY, scrollYProgress} = useScroll();
 /*useEffect(()=> {
@@ -172,7 +258,30 @@ const {scrollY, scrollYProgress} = useScroll();
 })*/
 
 const wrapperScale = useTransform(scrollYProgress, [0, 1], [1,2])
-    return (
+
+//------------------------------------------------------------------------
+
+const [show, setShow] = useState(false);
+
+const onclick = () => {
+setShow((current)=>!current)
+}
+
+//------------------------------------------------------------------------
+
+const [visible, setVisible] = useState(1);
+const [back, setBack] = useState(false);
+const nextPlease = () => {
+  setBack(false)
+  setVisible((prev) => (prev === 10 ? 10 : prev+1))
+}
+const prevPlease = () => {
+  setBack(true)
+  setVisible((prev) => (prev === 1 ? 1 : prev-1))
+}
+
+
+return (
         <Wrapper style={{background: gradient}}>
     {/*<Box 
     initial={{scale: 0}}
@@ -228,7 +337,31 @@ dragSnapToOrigin
 />
 {/*<button onClick={()=>{x.set(100)}}>set X</button>*/}
 
+<AnimatePresence>{show ? 
+<Box4 
+variants={box4Vars} 
+initial="initial" 
+animate="visible" 
+exit="leaving"/>: null}</AnimatePresence>
+{/* <AnimatePresence>는 안쪽에 사라지는 게 있다면  사라지는 것을 animate하게 해줌*/}
+<button onClick={onclick}>Click</button>
 
+<AnimatePresence mode="wait" custom={back}>
+<Box5 
+custom={back}
+variants={box5Vars} 
+initial="entry" 
+animate="center" 
+exit="exit" 
+key={visible}>{visible}</Box5>
+
+{/* element의 key를 바꿔주면 React는 element가 사라졌다고 생각함 
+  그래서 React는 이전의 컴포넌트을 없애고 새 컴포넌트을을 보여준다
+  이때, initial,animate,exit 세가지의 animation이 모두 실행된다
+*/}
+</AnimatePresence>
+<button onClick={nextPlease}>next</button>
+<button onClick={prevPlease}>previous</button>
 </Wrapper>
     )
 }
