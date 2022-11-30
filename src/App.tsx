@@ -187,7 +187,8 @@ const Box5 = styled(motion.div)`
   justify-content: center;
   align-items: center;
 position: absolute;
-top: 410%;
+top: 290%;
+right: 10%
 `;
 
 const box5Vars = {
@@ -217,6 +218,44 @@ const box5Vars = {
     }
   })
 }
+
+//---------------------------------------------------------------------------------------------
+
+const Box6 = styled(motion.div)`
+  width: 400px;
+  height: 400px;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+`;
+const SecondCircle = styled(motion.div)`
+background-color: #00a5ff;
+height: 100px;
+width: 100px;
+border-radius: 50px;
+box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+`;
+
+//---------------------------------------------------------------------------------------------
+
+const Box7 = styled(motion.div)`
+  width: 400px;
+  height: 400px;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+const ThirdCircle = styled(motion.div)`
+background-color: #00a5ff;
+height: 100px;
+width: 100px;
+border-radius: 50px;
+box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+`;
 
 function App(){
   const biggerBoxRef = useRef<HTMLDivElement>(null);
@@ -280,9 +319,14 @@ const prevPlease = () => {
   setVisible((prev) => (prev === 1 ? 1 : prev-1))
 }
 
+//------------------------------------------------------------------------
 
+const [clicked,setClicked] = useState(false);
+const toggleClick = () => {
+  setClicked((prev) => !prev)
+}
 return (
-        <Wrapper style={{background: gradient}}>
+        <Wrapper style={{background: gradient}} onClick={toggleClick}>
     {/*<Box 
     initial={{scale: 0}}
     animate={{ scale: 1, rotateZ: 360}}
@@ -362,6 +406,27 @@ key={visible}>{visible}</Box5>
 </AnimatePresence>
 <button onClick={nextPlease}>next</button>
 <button onClick={prevPlease}>previous</button>
+
+<Box6 style={{
+justifyContent: clicked ? "center" : "flex-start",
+alignItems: clicked ? "center" : "flex-start",
+}}>
+ <SecondCircle layout/> 
+ {/*
+  style이나 CSS는 state(clicked)에 의해 바뀔 수 있다 
+  layout를 쓰면 자동으로 animate가 된다
+  layout을 쓴다는 건 state로 style을 바꾼다는 것이다
+ */}
+</Box6>
+
+<Box7>
+{!clicked ? <ThirdCircle layoutId="circle" style={{borderRadius: 50}}/> : null}
+</Box7>
+{/* 두 개의 <ThirdCircle/>는 서로 다른 컴포넌트이나 layoutId를 통해 두 컴포넌트를 같게한다 */}
+<Box7>
+{clicked ? <ThirdCircle layoutId="circle" style={{borderRadius: 0, scale: 2}}/> : null}
+</Box7>
+
 </Wrapper>
     )
 }
