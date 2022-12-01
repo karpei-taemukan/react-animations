@@ -187,7 +187,7 @@ const Box5 = styled(motion.div)`
   justify-content: center;
   align-items: center;
 position: absolute;
-top: 290%;
+top: 200%;
 right: 10%
 `;
 
@@ -257,6 +257,58 @@ border-radius: 50px;
 box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
 `;
 
+//---------------------------------------------------------------------------------------------
+
+
+const Box8 = styled(motion.div)`
+  width: 200px;
+  height: 200px;
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+`;
+
+const GridBox = styled.div`
+margin-top: 10%;
+width: 920px;
+height: 420px;
+display: grid;
+grid-template-columns: repeat(3,1fr);
+gap: 10px;
+div:first-child,
+div:last-child {
+  grid-column: span 2;
+  width: 610px;
+}
+div:nth-child(2),
+div:nth-child(3) {
+  width: 300px;
+}
+text-align: center;
+line-height : 200px;
+`
+const Overlay = styled(motion.div)`
+width: 100%;
+height: 100%;
+background-color: rgba(0,0,0,0.7);
+position: absolute;
+top: 430%;
+display: flex;
+justify-content: center;
+align-items: center;
+`
+const overLayVars = {
+start: {
+  backgroundColor: "rgba(0, 0, 0, 0)" 
+  },
+end: {
+  backgroundColor: "rgba(0, 0, 0, 0.5)"
+},
+out: {
+  backgroundColor: "rgba(0, 0, 0, 0)"
+}
+}
+
 function App(){
   const biggerBoxRef = useRef<HTMLDivElement>(null);
 
@@ -325,6 +377,12 @@ const [clicked,setClicked] = useState(false);
 const toggleClick = () => {
   setClicked((prev) => !prev)
 }
+
+//------------------------------------------------------------------------
+
+const [id, setId] = useState<null | string>(null);
+// useState<null | string>(null); 타입스크립트한테 null 아니면 string 말해줌
+console.log(id)
 return (
         <Wrapper style={{background: gradient}} onClick={toggleClick}>
     {/*<Box 
@@ -426,6 +484,38 @@ alignItems: clicked ? "center" : "flex-start",
 <Box7>
 {clicked ? <ThirdCircle layoutId="circle" style={{borderRadius: 0, scale: 2}}/> : null}
 </Box7>
+
+<GridBox>  
+{["1","2","3","4"].map(n=> 
+<Box8
+onClick={()=> setId(n)}
+key={n} layoutId={n}></Box8>)}
+
+
+{/*  onClick={setId(n)} 이라 쓰면 함수는 즉시 실행
+    onClick={()=> setId(n)} 이라 쓰면 함수는 <Box8>가 클릭될 때만 실행
+*/}
+
+
+  </GridBox>
+  <AnimatePresence>
+
+ {id ? 
+ <Overlay 
+ onClick={()=>setId(null)}
+ variants={overLayVars} 
+ initial="start" 
+ animate="end"
+ exit="out"
+><Box8 layoutId={id} style={{width: "400px", height: "200px"}}></Box8></Overlay> : null}
+
+ </AnimatePresence>
+
+{/* 
+  $$  408번 줄의 <Box8> 와 507번 줄의 <Box8> 들은 id로 연결했다한들, 같은 컴포넌트가 아니다 $$
+ */}
+
+
 
 </Wrapper>
     )
